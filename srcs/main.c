@@ -3,131 +3,140 @@
 
 #include "../includes/ft_ls.h"
 
-t_files *ft_newfile(char *name, struct dirent *de)
-{
-	t_files *new;
-
-	new = malloc(sizeof(t_files));
-	new->name = ft_strdup(name);
-	new->link = de;
-	new->next = NULL;
-	new->prev = NULL;
-	return (new);
-}
-
-t_files	*ft_addfile(t_files *file, char *name, struct dirent *de)
-{
-	t_files *ptr;
-	t_files *new;
-
-	new = ft_newfile(name, de);
-	ptr = file;
-	if (ptr == NULL)
-		file = new;
-	else
-	{
-	while (ptr->next != NULL)
-		ptr = ptr->next;
-	ptr->next = new;
-	new->prev = ptr;
-	}
-	return (file);
-}
-
-t_files	*ft_readall()
+t_files	*ft_readall(DIR* dir, unsigned char flags)
 {
 	struct dirent *de;
-	DIR *dr;
 	t_files *file;
 	
-	dr = opendir(".");
 	file = NULL; 
-	while ((de = readdir(dr)) != NULL) 
-		file = ft_addfile(file ,de->d_name, de); 
-	closedir(dr);
+	while ((de = readdir(dir)) != NULL)
+		if ( flags & 1 || de->d_name[0] != '.')
+			file = ft_addfile(file ,de->d_name, de); 
 	return (file); 
 }
 
-int ft_printall(t_files *files)
+
+
+int ft_printall(DIR* dir, unsigned char flags)
 {
 	t_files *ptr;
+	t_files *files;
+	DIR*	tmp_dir;
+	int		maxLen;
 	
+	files = ft_readall(dir, flags);
+	ptr = files;
+	//ptr = ft_filesort(ptr);
+	ptr = files;
+	maxLen = ft_maxWidth(ptr) + 1;
+	maxLen *= -1;
 	ptr = files;
 	while (ptr != NULL)
 	{
-		printf("%-16s", ptr->name);
+		printf("%*s", maxLen, ptr->name);
 		ptr = ptr->next;
+	}
+	printf("\n");
+	if (flags & 64)
+	{
+		
+		ptr = files;
+		while (ptr != NULL)
+		{
+			if (ptr->name != NULL /*&& ft_strcmp(ft_strdup(ptr->name),ft_strdup(".")) != 0 && ft_strcmp(ft_strdup(ptr->name), ft_strdup("..")) != 0*/ &&  ptr->link->d_type == 4)
+			{
+				printf("%s:\n",ptr->name);
+				tmp_dir = opendir(ptr->name);
+				ft_printall( tmp_dir, flags);
+			}
+			ptr = ptr->next;
+		}
 	}
 	printf("\n");
 	return (0);
 }
 
-void ft_fileswap(t_files *ptr, t_files *ptr2)
-{
-	if (ptr != NULL)
-		ptr->prev->next = ptr2;
-	ptr2->prev = ptr->prev;
-	ptr->prev = ptr2;
-	ptr->next = ptr2->next;
-	if (ptr2->next != NULL)
-		ptr2->next->prev = ptr;
-	ptr2->next = ptr;
-}
-
-t_files *ft_filesort(t_files *files)
-{
-	t_files	*ptr;
-
-	ptr = files;
-	while (ptr->next != NULL)
-	{
-		if (ft_strcmp(ptr->name, ptr->next->name) > 0)
-		{
-			ft_fileswap(ptr, ptr->next);
-			ptr = files;
-		}
-		else
-		ptr = ptr->next;
-	}
-	return (files);	
-}
-
-int	ft_converter(char c, t_files *files)
+unsigned char	ft_flags(char c, unsigned char flags)
 {
 	if (c == 'a')
-		return (ft_filesort(files));
-	if (c == 'd')
-		return (1);
-	if (c == 'f')
-		return (0);
-	if (c == 'g')
-		return (3);
-	if (c == 'l')
-		return (4);
-	if (c == 'r')
-		return (5);
-	if (c == 'R')
-		return (6);
-	if (c == 'U')
-		return (7);
-	if (c == 'G')
-		return (8);
-	if (c == 't')
-		return (9);
-	return (-1);
+		flags |= 1;
+	else if (c == 'd')
+		flags |= 2;
+	else if (c == 'f')
+		flags |= 4;
+	else if (c == 'g')
+		flags |= 8;
+	else if (c == 'l')
+		flags |= 16;
+	else if (c == 'r')
+		flags |= 32;
+	else if (c == 'R')
+		flags |= 64;
+	else if (c == 'U')
+		flags |= 128;
+	else if (c == 'G')
+		flags |= 256;
+	else if (c == 't')
+		flags |= 512;
+	else
+	{
+		printf("%s\n", "usage: ls [-adfglrtRUG] [file ...]");
+		exit(0);
+	}
+	return (flags);
+
 }
 
 int	main(int ac, char **av)
 {
-	char *str;
+	char 			*str;
+	int				loop;
+	unsigned char	flags;
+	DIR* 			dir;
+	t_dir 			*dirs;
+	int				eDir;
+
+	loop = 0;
+	eDir = 0;
 	t_files	*files;
-	if (ac == 2)
+	while (++loop < ac)
 	{
-		files = ft_readall();
-		str = av[1];
+		str = av[loop];
 		if (*str == '-')
 			while (*(++str) != '\0')
-				return(ft_converter(*str, files));
+				flags = ft_flags(*str, flags);
+		else 
+		{
+			loop--;
+
+			while (++loop < ac)
+			{
+				eDir = 1;
+				if ((dir = opendir(av[loop])))
+				{
+					dirs = ft_addDir(dirs ,av[loop]);
+					closedir(dir);
+				}
+				else
+				{
+					printf("ls: %s: No such file or directory\n",av[loop]);
+				}
+			}
+		}
 	}
+	if (eDir == 0)
+	{
+		dir = opendir(".");
+		ft_printall(dir, flags);
+	}
+	else
+		while (dirs != NULL)
+		{
+			printf("%s:\n", dirs->path);
+			dir = opendir(dirs->path);
+			ft_printall(dir, flags);
+			dirs = dirs->next;
+		}
+		
 return (0);
 }
