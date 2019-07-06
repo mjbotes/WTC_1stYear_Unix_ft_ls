@@ -6,19 +6,24 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:00:42 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/05 14:45:21 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/06 13:17:40 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-t_files *ft_newfile(char *name, struct dirent *de)
+t_files *ft_newfile(struct stat fileStat, struct dirent *de)
 {
 	t_files *new;
 
 	new = malloc(sizeof(t_files));
-	new->name = ft_strdup(name);
+	new->name = ft_strdup(de->name);
 	new->link = de;
+	new->attr = ft_getAttr(fileStat);
+	new->gName = ft_getGName(fileStat);
+	new->uName = ft_getUName(fileStat);
+	new->size = fileStat.st_size;
+	ft_timeConverter(new, fileStat.st_time);
 	new->next = NULL;
 	new->prev = NULL;
 	return (new);

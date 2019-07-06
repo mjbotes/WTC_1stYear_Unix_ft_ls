@@ -10,7 +10,7 @@ t_files	*ft_readall(DIR* dir, unsigned char flags)
 	
 	file = NULL; 
 	while ((de = readdir(dir)) != NULL)
-		if ( flags & 1 || de->d_name[0] != '.')
+		//if ( flags & 1 || de->d_name[0] != '.')
 			file = ft_addfile(file ,de->d_name, de); 
 	return (file); 
 }
@@ -26,14 +26,19 @@ int ft_printall(DIR* dir, unsigned char flags)
 	
 	files = ft_readall(dir, flags);
 	ptr = files;
-	//ptr = ft_filesort(ptr);
+	if (!(flags & 4))
+	ptr = ft_filesort(ptr);
 	ptr = files;
 	maxLen = ft_maxWidth(ptr) + 1;
 	maxLen *= -1;
 	ptr = files;
 	while (ptr != NULL)
 	{
-		printf("%*s", maxLen, ptr->name);
+		if (flags & 1 || flags & 4 || !(flags & 8) || ptr->name[0] != '.')
+			if (flags & 8)
+				ft_printlongformat(ptr, flags);
+			else 
+				printf("%*s", maxLen, ptr->name);
 		ptr = ptr->next;
 	}
 	printf("\n");
@@ -52,7 +57,6 @@ int ft_printall(DIR* dir, unsigned char flags)
 			ptr = ptr->next;
 		}
 	}
-	printf("\n");
 	return (0);
 }
 
