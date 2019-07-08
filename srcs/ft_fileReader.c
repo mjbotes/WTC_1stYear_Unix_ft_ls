@@ -6,13 +6,13 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 11:28:39 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/06 13:09:11 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/08 13:59:41 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-char	*getAttr(struct stat fileStat)
+char	*ft_getAttr(struct stat fileStat)
 {
 	char		attr[11];
 
@@ -31,7 +31,7 @@ char	*getAttr(struct stat fileStat)
 	return (ft_strdup(attr));
 }
 
-char	*getGName(struct stat fileStat)
+char	*ft_getGName(struct stat fileStat)
 {
 	struct group	*grp;
 
@@ -39,10 +39,26 @@ char	*getGName(struct stat fileStat)
 	return (ft_strdup(grp->gr_name));
 }
 
-char	*getUName(struct stat fileStat)
+char	*ft_getUName(struct stat fileStat)
 {
 	struct passwd	*user;
 
 	user  = getpwuid(fileStat.st_uid);
 	return (ft_strdup(user->pw_name));
+}
+
+int		ft_getTotalLinks(t_files *files, unsigned char flags)
+{
+	t_files	*ptr;
+	int		total;
+
+	ptr=files;
+	total = 0;
+	while(ptr != NULL)
+	{
+		if (flags & 1 || flags & 4 || ptr->name[0] != '.')
+			total += ptr->blocks;
+		ptr = ptr->next;
+	}
+	return (total);
 }

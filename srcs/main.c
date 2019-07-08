@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/07/08 15:41:21 by mbotes            #+#    #+#             */
+/*   Updated: 2019/07/08 15:52:26 by mbotes           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <dirent.h>
 
 #include "../includes/ft_ls.h"
 
-t_files	*ft_readall(DIR* dir, unsigned char flags)
+t_files	*ft_readall(DIR* dir)
 {
 	struct dirent *de;
 	t_files *file;
@@ -11,7 +22,7 @@ t_files	*ft_readall(DIR* dir, unsigned char flags)
 	file = NULL; 
 	while ((de = readdir(dir)) != NULL)
 		//if ( flags & 1 || de->d_name[0] != '.')
-			file = ft_addfile(file ,de->d_name, de); 
+			file = ft_addfile(file, de); 
 	return (file); 
 }
 
@@ -24,31 +35,32 @@ int ft_printall(DIR* dir, unsigned char flags)
 	DIR*	tmp_dir;
 	int		maxLen;
 	
-	files = ft_readall(dir, flags);
+	files = ft_readall(dir);
 	ptr = files;
 	if (!(flags & 4))
-	ptr = ft_filesort(ptr);
+		ptr = ft_filesort(ptr);
+
 	ptr = files;
 	maxLen = ft_maxWidth(ptr) + 1;
 	maxLen *= -1;
 	ptr = files;
-	while (ptr != NULL)
+	if (flags & 8 || flags & 16)
+		ft_printlongformat(ptr, flags);
+	while (ptr != NULL && !(flags & 8 || flags & 16))
 	{
-		if (flags & 1 || flags & 4 || !(flags & 8) || ptr->name[0] != '.')
-			if (flags & 8)
-				ft_printlongformat(ptr, flags);
-			else 
-				printf("%*s", maxLen, ptr->name);
+		if ((flags & 1 || flags & 4 || ptr->name[0] != '.'))
+		{
+			printf("%s\n", ptr->name);
+		}
 		ptr = ptr->next;
 	}
-	printf("\n");
 	if (flags & 64)
 	{
-		
 		ptr = files;
 		while (ptr != NULL)
 		{
-			if (ptr->name != NULL /*&& ft_strcmp(ft_strdup(ptr->name),ft_strdup(".")) != 0 && ft_strcmp(ft_strdup(ptr->name), ft_strdup("..")) != 0*/ &&  ptr->link->d_type == 4)
+			if (ptr->name != NULL && ft_strcmp(ft_strdup(ptr->name),ft_strdup(".")) != 0 && 
+					ft_strcmp(ft_strdup(ptr->name), ft_strdup("..")) != 0 &&  ptr->link->d_type == 4)
 			{
 				printf("%s:\n",ptr->name);
 				tmp_dir = opendir(ptr->name);
@@ -84,8 +96,8 @@ unsigned char	ft_flags(char c, unsigned char flags)
 		flags |= 512;
 	else
 	{
-		printf("%s\n", "usage: ls [-adfglrtRUG] [file ...]");
-		exit(0);
+		printf("%s\n", "usage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]");
+		exit(1);
 	}
 	return (flags);
 
@@ -102,7 +114,6 @@ int	main(int ac, char **av)
 
 	loop = 0;
 	eDir = 0;
-	t_files	*files;
 	while (++loop < ac)
 	{
 		str = av[loop];

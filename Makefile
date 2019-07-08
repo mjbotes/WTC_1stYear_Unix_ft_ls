@@ -2,7 +2,7 @@ NAME = ft_ls
 
 # Project builds and dirs
 SRCDIR = ./srcs/
-SRCNAMES = $(shell ls $(SRCDIR) | grep -E ".+\.c")
+SRCNAMES = ft_fileReader.c ft_files.c ft_dirs.c  ft_printlongformat.c ft_timeConverter.c main.c
 SRC = $(addprefix $(SRCDIR), $(SRCNAMES))
 INC = ./incudes/
 BUILDDIR = ./build/
@@ -11,12 +11,12 @@ BUILDOBJS = $(addprefix $(BUILDDIR), $(SRCNAMES:.c=.o))
 # Libft builds and dirs
 LIBDIR = ./libft/
 LIBFT = ./libft/libft.a
-LIBINC = ./libft/includes/
+LIBINC = ./libft//
 
 # Optimization and Compiler flags and commands
 CC = gcc
 OPFLAGS = -O3 -funroll-loops
-CFLAGS = 
+CFLAGS = -Wall -Werror -Wextra
 # Debugging flags
 DEBUG = -g
 

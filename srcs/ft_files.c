@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:00:42 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/06 13:17:40 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/08 15:58:47 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,24 +17,28 @@ t_files *ft_newfile(struct stat fileStat, struct dirent *de)
 	t_files *new;
 
 	new = malloc(sizeof(t_files));
-	new->name = ft_strdup(de->name);
+	new->name = ft_strdup(de->d_name);
 	new->link = de;
+	new->links = fileStat.st_nlink;
 	new->attr = ft_getAttr(fileStat);
 	new->gName = ft_getGName(fileStat);
 	new->uName = ft_getUName(fileStat);
 	new->size = fileStat.st_size;
-	ft_timeConverter(new, fileStat.st_time);
+	new->blocks = fileStat.st_blocks;
+	ft_timeConverter(new, fileStat.st_mtime);
 	new->next = NULL;
 	new->prev = NULL;
 	return (new);
 }
 
-t_files	*ft_addfile(t_files *file, char *name, struct dirent *de)
+t_files	*ft_addfile(t_files *file, struct dirent *de)
 {
-	t_files *ptr;
-	t_files *new;
-
-	new = ft_newfile(name, de);
+	t_files		*ptr;
+	t_files 	*new;
+	struct stat	filestat;
+	
+	stat(de->d_name, &filestat);
+	new = ft_newfile(filestat, de);
 	ptr = file;
 	if (ptr == NULL)
 		file = new;
@@ -50,7 +54,6 @@ t_files	*ft_addfile(t_files *file, char *name, struct dirent *de)
 
 t_files	*ft_fileswap(t_files *ptr, t_files *ptr2)
 {
-	char *tmp;
 	if (ptr->prev != NULL)
 		ptr->prev->next = ptr2;
 	ptr2->prev = ptr->prev;
@@ -80,18 +83,4 @@ t_files *ft_filesort(t_files *files)
 	return (files);	
 }
 
-int ft_maxWidth(t_files *files)
-{
-	int len;
-	t_files	*ptr;
-
-	len = 15;
-	ptr = files;
-	while (ptr != NULL)
-	{
-		if (len < ft_strlen(ptr->name))
-			len = ft_strlen(ptr->name);
-		ptr = ptr->next;
-	}
-	return (len);
-}
+void	ft_filedelete
