@@ -6,13 +6,13 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 10:52:47 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/05 11:00:25 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/09 14:33:10 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-t_dir	*ft_newDir(char *path)
+t_dir	*ft_newdir(char *path)
 {
 	t_dir	*new;
 
@@ -22,12 +22,12 @@ t_dir	*ft_newDir(char *path)
 	return (new);
 }
 
-t_dir *ft_addDir(t_dir *dirs, char *path)
+t_dir	*ft_adddir(t_dir *dirs, char *path)
 {
 	t_dir	*ptr;
 	t_dir	*new;
 
-	new = ft_newDir(path);
+	new = ft_newdir(path);
 	if (dirs == NULL)
 		return(new);
 	ptr = dirs;

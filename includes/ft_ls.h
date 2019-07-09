@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 11:13:18 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/08 13:58:41 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/09 15:56:25 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@
 # include <grp.h>
 # include <time.h>
 
-#include "../libft/libft.h"
+# include "../libft/libft.h"
+# include "../ft_printf/include/ft_printf.h"
 
 typedef struct		s_files 
 {
@@ -29,12 +30,13 @@ typedef struct		s_files
 	struct dirent	*link;
 	int				links;
 	char			*attr;
-	char			*gName;
-	char			*uName;
+	char			*gname;
+	char			*uname;
 	int				size;
 	char			*month;
 	char			*day;
-	time_t			tTime;
+	time_t			ttime;
+	int				ntime;
 	char			*time;
 	int				blocks;
 	struct s_files	*next;
@@ -46,18 +48,22 @@ typedef struct		s_dir
 	char			*path;
 	struct s_dir	*next;
 }					t_dir;
-char			*ft_getUName(struct stat fileStat);
-char			*ft_getGName(struct stat fileStat);
-char			*ft_getAttr(struct stat fileStat);
-t_files			*ft_newfile(struct stat fileStat, struct dirent *de);
-t_files			*ft_addfile(t_files *file, struct dirent *de);
-t_files			*ft_fileswap(t_files *ptr, t_files *ptr2);
-t_files 		*ft_filesort(t_files *files);
-t_dir			*ft_newDir(char *path);
-t_dir 			*ft_addDir(t_dir *dirs, char *path);
-int				ft_maxWidth(t_files *files);
-void			ft_printlongformat(t_files *files, unsigned char flags);
-void			ft_timeConverter(t_files *new, time_t time);
-int				ft_getTotalLinks(t_files *files, unsigned char flags);
 
-#endif
+char				*ft_getuname(struct stat fileStat);
+char				*ft_getgname(struct stat fileStat);
+char				*ft_getattr(struct stat fileStat);
+t_files 			*ft_filesort(t_files *files);
+t_files				*ft_revsort(t_files *files, char *path);
+t_files 			*ft_filetimesort(t_files *files);
+t_dir				*ft_newdir(char *path);
+t_dir 				*ft_adddir(t_dir *dirs, char *path);
+void				ft_printlongformat(t_files *files, unsigned int flags, char *path);
+void				ft_timeconverter(t_files *new, time_t time);
+int					ft_gettotallinks(t_files *files, unsigned int flags);
+void				ft_filedelete(t_files *file);
+t_files				*ft_fileswap(t_files *ptr, t_files *ptr2);
+t_files				*ft_addfile(t_files *file, struct dirent *de, char *path);
+t_files 			*ft_newfile(struct stat fileStat, struct dirent *de);
+t_files				*ft_free(t_files *files);
+
+# endif

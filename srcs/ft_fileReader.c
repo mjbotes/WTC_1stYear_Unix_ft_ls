@@ -6,53 +6,73 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 11:28:39 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/08 13:59:41 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/09 14:49:53 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-char	*ft_getAttr(struct stat fileStat)
+static char		ft_filetype(int mode)
+{
+	mode = (mode & S_IFMT);
+	if (S_ISREG(mode))
+		return ('-');
+	else if (S_ISDIR(mode))
+		return ('d');
+	else if (S_ISLNK(mode))
+		return ('l');
+	else if (S_ISBLK(mode))
+		return ('b');
+	else if (S_ISCHR(mode))
+		return ('c');
+	else if (S_ISSOCK(mode))
+		return ('s');
+	else if (S_ISFIFO(mode))
+		return ('p');
+	else
+		return ('-');
+}
+
+char			*ft_getattr(struct stat filestat)
 {
 	char		attr[11];
 
-	attr[0] = ((S_ISDIR(fileStat.st_mode)) ? 'd' : '-');
-	attr[1] = ((fileStat.st_mode & S_IRUSR) ? 'r' : '-');
-	attr[2] = ((fileStat.st_mode & S_IWUSR) ? 'w' : '-');
-	attr[3] = ((fileStat.st_mode & S_IXUSR) ? 'x' : '-');
-	attr[4] = ((fileStat.st_mode & S_IRGRP) ? 'r' : '-');
-	attr[5] = ((fileStat.st_mode & S_IWGRP) ? 'w' : '-');
-	attr[6] = ((fileStat.st_mode & S_IXGRP) ? 'x' : '-');
-	attr[7] = ((fileStat.st_mode & S_IROTH) ? 'r' : '-');
-	attr[8] = ((fileStat.st_mode & S_IWOTH) ? 'w' : '-');
-	attr[9] = ((fileStat.st_mode & S_IXOTH) ? 'x' : '-');
+	attr[0] = ft_filetype(filestat.st_mode);
+	attr[1] = ((filestat.st_mode & S_IRUSR) ? 'r' : '-');
+	attr[2] = ((filestat.st_mode & S_IWUSR) ? 'w' : '-');
+	attr[3] = ((filestat.st_mode & S_IXUSR) ? 'x' : '-');
+	attr[4] = ((filestat.st_mode & S_IRGRP) ? 'r' : '-');
+	attr[5] = ((filestat.st_mode & S_IWGRP) ? 'w' : '-');
+	attr[6] = ((filestat.st_mode & S_IXGRP) ? 'x' : '-');
+	attr[7] = ((filestat.st_mode & S_IROTH) ? 'r' : '-');
+	attr[8] = ((filestat.st_mode & S_IWOTH) ? 'w' : '-');
+	attr[9] = ((filestat.st_mode & S_IXOTH) ? 'x' : '-');
 	attr[10] = '\0';
-
 	return (ft_strdup(attr));
 }
 
-char	*ft_getGName(struct stat fileStat)
+char			*ft_getgname(struct stat filestat)
 {
 	struct group	*grp;
 
-	grp = getgrgid(fileStat.st_gid);
+	grp = getgrgid(filestat.st_gid);
 	return (ft_strdup(grp->gr_name));
 }
 
-char	*ft_getUName(struct stat fileStat)
+char			*ft_getuname(struct stat filestat)
 {
 	struct passwd	*user;
 
-	user  = getpwuid(fileStat.st_uid);
+	user = getpwuid(filestat.st_uid);
 	return (ft_strdup(user->pw_name));
 }
 
-int		ft_getTotalLinks(t_files *files, unsigned char flags)
+int				ft_gettotallinks(t_files *files, unsigned int flags)
 {
 	t_files	*ptr;
 	int		total;
 
-	ptr=files;
+	ptr = files;
 	total = 0;
 	while(ptr != NULL)
 	{

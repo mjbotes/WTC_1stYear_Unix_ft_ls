@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/08 15:41:21 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/08 15:52:26 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/09 15:56:57 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,58 +14,62 @@
 
 #include "../includes/ft_ls.h"
 
-t_files	*ft_readall(DIR* dir)
+t_files	*ft_readall(DIR* dir, char *path)
 {
 	struct dirent *de;
 	t_files *file;
 	
 	file = NULL; 
 	while ((de = readdir(dir)) != NULL)
-		//if ( flags & 1 || de->d_name[0] != '.')
-			file = ft_addfile(file, de); 
+			file = ft_addfile(file, de, path); 
 	return (file); 
 }
 
-
-
-int ft_printall(DIR* dir, unsigned char flags)
+int ft_printall(DIR* dir, unsigned char flags, char *path)
 {
 	t_files *ptr;
 	t_files *files;
+	char	*tmpPath;
+	char	*tPath;
 	DIR*	tmp_dir;
-	int		maxLen;
 	
-	files = ft_readall(dir);
+	files = ft_readall(dir , path);
 	ptr = files;
 	if (!(flags & 4))
 		ptr = ft_filesort(ptr);
-
-	ptr = files;
-	maxLen = ft_maxWidth(ptr) + 1;
-	maxLen *= -1;
-	ptr = files;
+	if (flags & 128)
+		ptr = ft_filetimesort(ptr);
+	if (flags & 32)
+		ptr = ft_revsort(ptr, path);
 	if (flags & 8 || flags & 16)
-		ft_printlongformat(ptr, flags);
+		ft_printlongformat(ptr, flags, path);
 	while (ptr != NULL && !(flags & 8 || flags & 16))
 	{
 		if ((flags & 1 || flags & 4 || ptr->name[0] != '.'))
-		{
-			printf("%s\n", ptr->name);
-		}
+			ft_putendl(ptr->name);
 		ptr = ptr->next;
+
 	}
+	ptr = ft_free(files);
 	if (flags & 64)
 	{
-		ptr = files;
 		while (ptr != NULL)
 		{
-			if (ptr->name != NULL && ft_strcmp(ft_strdup(ptr->name),ft_strdup(".")) != 0 && 
-					ft_strcmp(ft_strdup(ptr->name), ft_strdup("..")) != 0 &&  ptr->link->d_type == 4)
-			{
-				printf("%s:\n",ptr->name);
-				tmp_dir = opendir(ptr->name);
-				ft_printall( tmp_dir, flags);
-			}
+			if ((flags & 1 || flags & 4 || ptr->name[0] != '.'))
+				if (ptr->name != NULL && ft_strcmp(ptr->name,".") != 0 && 
+						ft_strcmp(ptr->name, "..") != 0 )
+				{
+					tmpPath = ft_strjoin(path, "/");
+					tPath = ft_strjoin(tmpPath, ptr->name);
+					ft_strdel(&tmpPath);
+					if ((tmp_dir = opendir(tPath)) != NULL)
+					{
+						ft_printf("%s:\n",tPath);
+						ft_printall(tmp_dir, flags, tPath);	
+						ft_putchar('\n');
+					}
+					ft_strdel(&tPath);	
+				}
 			ptr = ptr->next;
 		}
 	}
@@ -88,15 +92,19 @@ unsigned char	ft_flags(char c, unsigned char flags)
 		flags |= 32;
 	else if (c == 'R')
 		flags |= 64;
-	else if (c == 'U')
+	else if (c == 't')
 		flags |= 128;
 	else if (c == 'G')
 		flags |= 256;
-	else if (c == 't')
+	else if (c == 'U')
 		flags |= 512;
+	else if (c == '1')
+		return (flags);
 	else
 	{
-		printf("%s\n", "usage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]");
+		ft_putstr("ls: illegal option -- ");
+		ft_putchar(c);
+		ft_putendl("\nusage: ls [-ABCFGHLOPRSTUWabcdefghiklmnopqrstuwx1] [file ...]");
 		exit(1);
 	}
 	return (flags);
@@ -123,35 +131,30 @@ int	main(int ac, char **av)
 		else 
 		{
 			loop--;
-
 			while (++loop < ac)
 			{
 				eDir = 1;
 				if ((dir = opendir(av[loop])))
 				{
-					dirs = ft_addDir(dirs ,av[loop]);
+					dirs = ft_adddir(dirs ,av[loop]);
 					closedir(dir);
 				}
 				else
-				{
-					printf("ls: %s: No such file or directory\n",av[loop]);
-				}
+					ft_printf("ls: %s: No such file or directory\n",av[loop]);
 			}
 		}
 	}
 	if (eDir == 0)
 	{
 		dir = opendir(".");
-		ft_printall(dir, flags);
+		ft_printall(dir, flags, ".");
 	}
 	else
 		while (dirs != NULL)
 		{
-			printf("%s:\n", dirs->path);
-			dir = opendir(dirs->path);
-			ft_printall(dir, flags);
+			dir = opendir(dirs->path);	
+			ft_printall(dir, flags, dirs->path);
 			dirs = dirs->next;
 		}
-		
 return (0);
 }

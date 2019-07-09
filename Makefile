@@ -2,7 +2,8 @@ NAME = ft_ls
 
 # Project builds and dirs
 SRCDIR = ./srcs/
-SRCNAMES = ft_fileReader.c ft_files.c ft_dirs.c  ft_printlongformat.c ft_timeConverter.c main.c
+SRCNAMES = ft_filereader.c ft_files.c ft_dirs.c  ft_printlongformat.c ft_timeconverter.c main.c
+SRCNAMES += ft_filesort.c ft_freemem.c
 SRC = $(addprefix $(SRCDIR), $(SRCNAMES))
 INC = ./incudes/
 BUILDDIR = ./build/
@@ -13,6 +14,10 @@ LIBDIR = ./libft/
 LIBFT = ./libft/libft.a
 LIBINC = ./libft//
 
+PRINTFDIR = ./ft_printf/
+PRINTF = ./ft_printf/libftprintf.a
+PRINTFINC = ./ft_printf/include/
+
 # Optimization and Compiler flags and commands
 CC = gcc
 OPFLAGS = -O3 -funroll-loops
@@ -21,7 +26,7 @@ CFLAGS = -Wall -Werror -Wextra
 DEBUG = -g
 
 # Main rule
-all: $(BUILDDIR) $(LIBFT) $(NAME)
+all: $(BUILDDIR) $(LIBFT) $(PRINTF) $(NAME)
 
 # Object dir rule
 $(BUILDDIR):
@@ -29,15 +34,18 @@ $(BUILDDIR):
 
 # Objects rule
 $(BUILDDIR)%.o:$(SRCDIR)%.c
-	$(CC) $(DEBUG) $(CFLAGS) -I$(LIBINC) -I$(INC) -o $@ -c $<
+	$(CC) $(DEBUG) $(CFLAGS) -I$(LIBINC) -I$(PRINTFINC) -I$(INC) -o $@ -c $<
 
 # Project file rule
 $(NAME): $(BUILDOBJS)
-	$(CC) $(OPFLAGS) $(CFLAGS) -o $(NAME) $(BUILDOBJS) $(LIBFT)
+	$(CC) $(OPFLAGS) $(CFLAGS) -o $(NAME) $(BUILDOBJS) $(LIBFT) $(PRINTF)
 
 # Libft rule
 $(LIBFT):
 	make -C $(LIBDIR)
+
+$(PRINTF):
+	make -C $(PRINTFDIR)
 
 # Cleaning up the build files
 clean:
