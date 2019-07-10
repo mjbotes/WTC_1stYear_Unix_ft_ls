@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:00:42 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 11:00:22 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 16:04:18 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ t_files	*ft_addfile(t_files *file, struct dirent *de, char *path)
 	fpath = ft_strjoin(tmp, de->d_name);
 	ft_strdel(&tmp);
 	lstat(fpath, &filestat);
+	ft_strdel(&fpath);
 	new = ft_newfile(filestat, de);
 	ptr = file;
 	if (ptr == NULL)
@@ -81,10 +82,14 @@ void	ft_filedelete(t_files *file)
 	ft_strdel(&file->attr);
 	ft_strdel(&file->gname);
 	ft_strdel(&file->uname);
+	ft_strdel(&file->month); 
+	ft_strdel(&file->day);
+	ft_strdel(&file->time);
 	file->size = 0;
 	file->blocks = 0;
 	file->next = NULL;
 	file->prev = NULL;
+	free(file);
 }
 
 void	ft_deletefilelist(t_files *files)
@@ -92,10 +97,10 @@ void	ft_deletefilelist(t_files *files)
 	t_files	*ptr;
 
 	ptr = files;
-	while (ptr != NULL)
+	while (ptr->next != NULL)
 	{
 		ptr = ptr->next;
-		ft_filedelete(files);
-		files = ptr;
+		ft_filedelete(ptr->prev);
 	}
+	ft_filedelete(ptr);
 }

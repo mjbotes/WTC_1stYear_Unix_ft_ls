@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 07:24:34 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 13:46:46 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 16:18:34 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,16 @@ t_files	*ft_revsort(t_files *files, char *path)
 		ptr = ptr->next;
 	while (ptr != NULL)
 	{
+		if (ptr->next != NULL)
+			ft_filedelete(ptr->next);
 		new = ft_addfile(new, ptr->link, path);
-		ptr = ptr->prev;
+		if (ptr->prev == NULL)
+		{
+			ft_filedelete(ptr);
+			break ;
+		}
+		else
+			ptr = ptr->prev;
 	}
 	return (new);
 }

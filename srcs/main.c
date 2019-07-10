@@ -6,34 +6,34 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/08 15:41:21 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 13:50:00 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 14:58:15 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-t_files			*ft_readall(DIR* dir, char *path)
+t_files			*ft_readall(DIR *dir, char *path)
 {
 	struct dirent	*de;
 	t_files			*file;
-	
-	file = NULL; 
+
+	file = NULL;
 	while ((de = readdir(dir)) != NULL)
 		file = ft_addfile(file, de, path);
-	return (file); 
+	return (file);
 }
 
 void			ft_recursion(char *path, t_files *ptr, unsigned char flags)
 {
 	char	*tmppath;
 	char	*tpath;
-	DIR*	tmp_dir;
+	DIR		*tmp_dir;
 
 	while (ptr != NULL)
 	{
 		if (flags & 1 || flags & 4 || ptr->name[0] != '.')
 			if (ptr->name != NULL && ft_strcmp(ptr->name, ".") != 0 &&
-					ft_strcmp(ptr->name, "..") != 0 )
+				ft_strcmp(ptr->name, "..") != 0)
 			{
 				tmppath = ft_strjoin(path, "/");
 				tpath = ft_strjoin(tmppath, ptr->name);
@@ -45,12 +45,13 @@ void			ft_recursion(char *path, t_files *ptr, unsigned char flags)
 					ft_putchar('\n');
 				}
 				ft_strdel(&tpath);
+				ft_strdel(&tmppath);
 			}
 		ptr = ptr->next;
 	}
 }
 
-int				ft_printall(DIR* dir, unsigned char flags, char *path)
+int				ft_printall(DIR *dir, unsigned char flags, char *path)
 {
 	t_files	*ptr;
 	t_files	*files;
@@ -69,14 +70,17 @@ int				ft_printall(DIR* dir, unsigned char flags, char *path)
 	closedir(dir);
 	if (flags & 64)
 		ft_recursion(path, files, flags);
+	ft_deletefilelist(files);
 	return (0);
 }
 
-t_dir			*ft_decrypt(unsigned char *flags, int ac,
-		char **av, t_dir *dirs, int loop, int i)
+t_dir			*ft_decrypt(unsigned char *flags, int ac, char **av, int loop)
 {
-	DIR*	dir;
+	DIR		*dir;
+	int		i;
+	t_dir	*dirs;
 
+	dirs = NULL;
 	while (++loop < ac)
 	{
 		i = 1;
@@ -104,7 +108,7 @@ int				main(int ac, char **av)
 	t_dir			*dirs;
 
 	dirs = NULL;
-	dirs = ft_decrypt(&flags, ac, av, dirs, 0, 1);
+	dirs = ft_decrypt(&flags, ac, av, 0);
 	if (dirs == NULL)
 		ft_printall(opendir("."), flags, ".");
 	else
@@ -113,5 +117,6 @@ int				main(int ac, char **av)
 			ft_printall(opendir(dirs->path), flags, dirs->path);
 			dirs = dirs->next;
 		}
+	sleep(100);
 	return (0);
 }

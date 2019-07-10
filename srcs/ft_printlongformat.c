@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 10:03:49 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 12:48:37 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 15:41:16 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ size_t	*ft_getformat(t_files *files)
 {
 	size_t		*arr;
 	t_files		*ptr;
+	char		*tmp;
 
 	if (!(arr = malloc(sizeof(size_t) * 4)))
 		return (NULL);
@@ -23,14 +24,16 @@ size_t	*ft_getformat(t_files *files)
 	ft_bzero(arr, 10);
 	while (ptr != NULL)
 	{
-		if (ft_strlen(ft_itoa(ptr->links)) > arr[0])
-			arr[0] = ft_strlen(ft_itoa(ptr->links));
+		if (ft_strlen((tmp = ft_itoa(ptr->links))) > arr[0])
+			arr[0] = ft_strlen(tmp);
+		ft_strdel(&tmp);
 		if (ft_strlen(ptr->uname) > arr[1])
 			arr[1] = ft_strlen(ptr->uname);
 		if (ft_strlen(ptr->gname) > arr[2])
 			arr[2] = ft_strlen(ptr->gname);
-		if (ft_strlen(ft_itoa(ptr->size)) > arr[3])
-			arr[3] = ft_strlen(ft_itoa(ptr->size));
+		if (ft_strlen((tmp = ft_itoa(ptr->size))) > arr[3])
+			arr[3] = ft_strlen(tmp);
+		ft_strdel(&tmp);
 		ptr = ptr->next;
 	}
 	return (arr);
@@ -46,7 +49,7 @@ void	ft_linkprint(char *path, t_files *ptr)
 	tmp = ft_strjoin(path, "/");
 	tpath = ft_strjoin(tmp, ptr->name);
 	ft_strdel(&tmp);
-	readlink(tpath, buffer, 128);
+	readlink(tpath, buffer, 64);
 	ft_printf(" -> %s", buffer);
 	ft_strdel(&tpath);
 }
@@ -55,6 +58,7 @@ void	ft_printlongformat(t_files *files, unsigned int flags, char *path)
 {
 	t_files		*ptr;
 	size_t		*arr;
+	int 		loop;
 
 	ptr = files;
 	arr = ft_getformat(files);
@@ -67,7 +71,7 @@ void	ft_printlongformat(t_files *files, unsigned int flags, char *path)
 			if (flags & 16)
 				ft_printf("%*s", (int)arr[1] + 1, ptr->uname);
 			ft_printf("%*s%*d%*s", (int)arr[2] + 2, ptr->gname, (int)arr[3] + 2,
-					ptr->size, 4,ptr->month);
+					ptr->size, 4, ptr->month);
 			ft_printf("%*s%*s %s", 3, ptr->day, 6, ptr->time, ptr->name);
 			if (ptr->attr[0] == 'l')
 				ft_linkprint(path, ptr);
@@ -75,4 +79,5 @@ void	ft_printlongformat(t_files *files, unsigned int flags, char *path)
 		}
 		ptr = ptr->next;
 	}
+	loop = 0;
 }
