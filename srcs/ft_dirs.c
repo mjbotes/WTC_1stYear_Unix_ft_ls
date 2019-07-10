@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 10:52:47 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/09 14:33:10 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 10:52:58 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ t_dir	*ft_adddir(t_dir *dirs, char *path)
 
 	new = ft_newdir(path);
 	if (dirs == NULL)
-		return(new);
+		return (new);
 	ptr = dirs;
 	while (ptr->next != NULL)
 		ptr = ptr->next;

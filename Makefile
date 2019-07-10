@@ -3,16 +3,16 @@ NAME = ft_ls
 # Project builds and dirs
 SRCDIR = ./srcs/
 SRCNAMES = ft_filereader.c ft_files.c ft_dirs.c  ft_printlongformat.c ft_timeconverter.c main.c
-SRCNAMES += ft_filesort.c ft_freemem.c
+SRCNAMES += ft_filesort.c ft_flags.c ft_error.c 
 SRC = $(addprefix $(SRCDIR), $(SRCNAMES))
 INC = ./incudes/
 BUILDDIR = ./build/
 BUILDOBJS = $(addprefix $(BUILDDIR), $(SRCNAMES:.c=.o))
 
 # Libft builds and dirs
-LIBDIR = ./libft/
-LIBFT = ./libft/libft.a
-LIBINC = ./libft//
+LIBDIR = ./ft_printf/libft/
+LIBFT = ./ft_printf/libft/libft.a
+LIBINC = ./ft_printflibft//
 
 PRINTFDIR = ./ft_printf/
 PRINTF = ./ft_printf/libftprintf.a

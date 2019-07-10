@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 11:28:39 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/09 14:49:53 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 11:02:29 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,10 @@ char			*ft_getgname(struct stat filestat)
 	struct group	*grp;
 
 	grp = getgrgid(filestat.st_gid);
-	return (ft_strdup(grp->gr_name));
+	if (grp != NULL)
+		return (ft_strdup(grp->gr_name));
+	else
+		return (ft_strdup("root"));
 }
 
 char			*ft_getuname(struct stat filestat)
@@ -74,7 +77,7 @@ int				ft_gettotallinks(t_files *files, unsigned int flags)
 
 	ptr = files;
 	total = 0;
-	while(ptr != NULL)
+	while (ptr != NULL)
 	{
 		if (flags & 1 || flags & 4 || ptr->name[0] != '.')
 			total += ptr->blocks;

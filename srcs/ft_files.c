@@ -6,15 +6,15 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:00:42 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/09 15:04:50 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/10 11:00:22 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-t_files *ft_newfile(struct stat filestat, struct dirent *de)
+t_files	*ft_newfile(struct stat filestat, struct dirent *de)
 {
-	t_files *new;
+	t_files	*new;
 
 	new = malloc(sizeof(t_files));
 	new->name = ft_strdup(de->d_name);
@@ -26,7 +26,9 @@ t_files *ft_newfile(struct stat filestat, struct dirent *de)
 	new->size = filestat.st_size;
 	new->blocks = filestat.st_blocks;
 	ft_timeconverter(new, filestat.st_mtime);
+	new->ctime = filestat.st_birthtime;
 	new->ntime = filestat.st_mtimespec.tv_nsec;
+	new->cntime = filestat.st_birthtimespec.tv_nsec;
 	new->next = NULL;
 	new->prev = NULL;
 	return (new);
@@ -35,25 +37,25 @@ t_files *ft_newfile(struct stat filestat, struct dirent *de)
 t_files	*ft_addfile(t_files *file, struct dirent *de, char *path)
 {
 	t_files			*ptr;
-	t_files 		*new;
+	t_files			*new;
 	struct stat		filestat;
-	char			*fPath;
+	char			*fpath;
 	char			*tmp;
-	
+
 	tmp = ft_strjoin(path, "/");
-	fPath = ft_strjoin(tmp, de->d_name);
+	fpath = ft_strjoin(tmp, de->d_name);
 	ft_strdel(&tmp);
-	lstat(fPath, &filestat);
+	lstat(fpath, &filestat);
 	new = ft_newfile(filestat, de);
 	ptr = file;
 	if (ptr == NULL)
 		return (new);
 	else
 	{
-	while (ptr->next != NULL)
-		ptr = ptr->next;
-	ptr->next = new;
-	new->prev = ptr;
+		while (ptr->next != NULL)
+			ptr = ptr->next;
+		ptr->next = new;
+		new->prev = ptr;
 	}
 	return (file);
 }
