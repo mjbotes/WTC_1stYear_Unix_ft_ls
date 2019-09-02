@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 12:57:37 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 15:03:14 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/14 14:37:04 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,6 @@ void	ft_timeconverter(t_files *new, time_t time)
 	new->time = ft_strndup(arr[3], 5);
 	ft_strdel(&arr[3]);
 	ft_strdel(&arr[4]);
+	free(arr);
 	new->ttime = time;
 }

@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 11:00:42 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 16:04:18 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/14 14:45:29 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_files	*ft_newfile(struct stat filestat, struct dirent *de)
 {
 	t_files	*new;
 
-	new = malloc(sizeof(t_files));
+	new = ft_memalloc(sizeof(t_files));
 	new->name = ft_strdup(de->d_name);
 	new->link = de;
 	new->links = filestat.st_nlink;
@@ -74,33 +74,27 @@ t_files	*ft_fileswap(t_files *ptr, t_files *ptr2)
 	return (ptr2);
 }
 
-void	ft_filedelete(t_files *file)
+void	ft_deletefilelist(t_files **files)
 {
-	ft_strdel(&file->name);
-	file->link = NULL;
-	file->links = 0;
-	ft_strdel(&file->attr);
-	ft_strdel(&file->gname);
-	ft_strdel(&file->uname);
-	ft_strdel(&file->month); 
-	ft_strdel(&file->day);
-	ft_strdel(&file->time);
-	file->size = 0;
-	file->blocks = 0;
-	file->next = NULL;
-	file->prev = NULL;
-	free(file);
-}
+	t_files	*next;
+	t_files	*curr;
 
-void	ft_deletefilelist(t_files *files)
-{
-	t_files	*ptr;
-
-	ptr = files;
-	while (ptr->next != NULL)
+	curr = *files;
+	while (curr != NULL)
 	{
-		ptr = ptr->next;
-		ft_filedelete(ptr->prev);
+		next = curr->next;
+		ft_strdel(&curr->name);
+		ft_strdel(&curr->attr);
+		ft_strdel(&curr->gname);
+		ft_strdel(&curr->uname);
+		ft_strdel(&curr->month);
+		ft_strdel(&curr->day);
+		ft_strdel(&curr->time);
+		curr->prev = NULL;
+		curr->next = NULL;
+		ft_memset(curr, 0, sizeof(t_files));
+		free(curr);
+		curr = next;
 	}
-	ft_filedelete(ptr);
+	*files = NULL;
 }

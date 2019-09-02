@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/08 15:41:21 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 14:58:15 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/14 14:46:17 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,18 @@ t_files			*ft_readall(DIR *dir, char *path)
 
 	file = NULL;
 	while ((de = readdir(dir)) != NULL)
+	{
 		file = ft_addfile(file, de, path);
+	}
 	return (file);
 }
 
-void			ft_recursion(char *path, t_files *ptr, unsigned char flags)
+int				ft_recursion(char *path, t_files *ptr, unsigned char flags)
 {
 	char	*tmppath;
 	char	*tpath;
 	DIR		*tmp_dir;
+	int		ret;
 
 	while (ptr != NULL)
 	{
@@ -41,36 +44,39 @@ void			ft_recursion(char *path, t_files *ptr, unsigned char flags)
 				if ((tmp_dir = opendir(tpath)) != NULL)
 				{
 					ft_printf("%s:\n", tpath);
-					ft_printall(tmp_dir, flags, tpath);
+					ret = ft_printall(tmp_dir, flags, tpath);
 					ft_putchar('\n');
 				}
 				ft_strdel(&tpath);
-				ft_strdel(&tmppath);
 			}
 		ptr = ptr->next;
 	}
+	return (0);
 }
 
 int				ft_printall(DIR *dir, unsigned char flags, char *path)
 {
 	t_files	*ptr;
 	t_files	*files;
+	int		ret;
 
 	files = ft_readall(dir, path);
 	ptr = files;
-	ptr = ft_sorter(ptr, flags, path);
+	ptr = ft_sorter(&ptr, flags, path);
+	files = ptr;
 	if (flags & 8 || flags & 16)
-		ft_printlongformat(ptr, flags, path);
-	while (ptr != NULL && !(flags & 8 || flags & 16))
-	{
-		if ((flags & 1 || flags & 4 || ptr->name[0] != '.'))
-			ft_putendl(ptr->name);
-		ptr = ptr->next;
-	}
+		ret = ft_printlongformat(files, flags, path);
+	else
+		while (ptr != NULL)
+		{
+			if ((flags & 1 || flags & 4 || ptr->name[0] != '.'))
+				ft_putendl(ptr->name);
+			ptr = ptr->next;
+		}
 	closedir(dir);
 	if (flags & 64)
 		ft_recursion(path, files, flags);
-	ft_deletefilelist(files);
+	ft_deletefilelist(&files);
 	return (0);
 }
 
@@ -117,6 +123,5 @@ int				main(int ac, char **av)
 			ft_printall(opendir(dirs->path), flags, dirs->path);
 			dirs = dirs->next;
 		}
-	sleep(100);
 	return (0);
 }

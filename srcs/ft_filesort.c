@@ -6,23 +6,23 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 07:24:34 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 16:18:34 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/14 13:52:37 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ls.h"
 
-t_files	*ft_sorter(t_files *ptr, unsigned char flags, char *path)
+t_files	*ft_sorter(t_files **ptr, unsigned char flags, char *path)
 {
-	if (!(flags & 4))
-		ptr = ft_filesort(ptr);
-	if (flags & 128)
-		ptr = ft_filetimesort(ptr);
+	if (!(flags & 4 && flags & 128 && flags & 512))
+		*ptr = ft_filesort(*ptr);
+	if (flags & 128 && !(flags & 512))
+		*ptr = ft_filetimesort(*ptr);
 	if (flags & 512)
-		ptr = ft_filectimesort(ptr);
+		*ptr = ft_filectimesort(*ptr);
 	if (flags & 32)
-		ptr = ft_revsort(ptr, path);
-	return (ptr);
+		*ptr = ft_revsort(*ptr, path);
+	return (*ptr);
 }
 
 t_files	*ft_revsort(t_files *files, char *path)
@@ -36,17 +36,10 @@ t_files	*ft_revsort(t_files *files, char *path)
 		ptr = ptr->next;
 	while (ptr != NULL)
 	{
-		if (ptr->next != NULL)
-			ft_filedelete(ptr->next);
 		new = ft_addfile(new, ptr->link, path);
-		if (ptr->prev == NULL)
-		{
-			ft_filedelete(ptr);
-			break ;
-		}
-		else
-			ptr = ptr->prev;
+		ptr = ptr->prev;
 	}
+	ft_deletefilelist(&files);
 	return (new);
 }
 

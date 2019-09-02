@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 10:52:47 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 10:52:58 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/13 11:11:16 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,21 @@ t_dir	*ft_adddir(t_dir *dirs, char *path)
 		ptr = ptr->next;
 	ptr->next = new;
 	return (dirs);
+}
+
+void	ft_deletedirs(t_dir **dirs)
+{
+	t_dir	*next;
+	t_dir	*curr;
+
+	curr = *dirs;
+	while (curr)
+	{
+		next = curr->next;
+		ft_strdel(&curr->path);
+		curr->next = NULL;
+		ft_memdel((void **)&curr);
+		curr = next;
+	}
+	*dirs = NULL;
 }

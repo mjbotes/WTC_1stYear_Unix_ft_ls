@@ -6,7 +6,7 @@
 /*   By: mbotes <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/06 11:13:18 by mbotes            #+#    #+#             */
-/*   Updated: 2019/07/10 15:59:00 by mbotes           ###   ########.fr       */
+/*   Updated: 2019/07/14 14:19:51 by mbotes           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,17 +53,17 @@ typedef struct		s_dir
 char				*ft_getuname(struct stat filestat);
 char				*ft_getgname(struct stat filestat);
 char				*ft_getattr(struct stat filestat);
-t_files				*ft_sorter(t_files *ptr, unsigned char flags, char *path);
+t_files				*ft_sorter(t_files **ptr, unsigned char flags, char	*path);
 t_files				*ft_filesort(t_files *files);
 t_files				*ft_revsort(t_files *files, char *path);
 t_files				*ft_filetimesort(t_files *files);
 t_dir				*ft_newdir(char *path);
 t_dir				*ft_adddir(t_dir *dirs, char *path);
-void				ft_printlongformat(t_files *files, unsigned int flags,
+int					ft_printlongformat(t_files *files, unsigned int flags,
 		char *path);
 void				ft_timeconverter(t_files *new, time_t time);
 int					ft_gettotallinks(t_files *files, unsigned int flags);
-void				ft_filedelete(t_files *file);
+void				ft_filedelete(t_files **file);
 t_files				*ft_fileswap(t_files *ptr, t_files *ptr2);
 t_files				*ft_addfile(t_files *file, struct dirent *de, char *path);
 t_files				*ft_newfile(struct stat filestat, struct dirent *de);
@@ -72,6 +72,6 @@ t_files				*ft_filectimesort(t_files *files);
 int					ft_printall(DIR *dir, unsigned char flags, char *path);
 unsigned char		ft_flags(char c, unsigned char flags);
 void				ft_nofileerror(char *name);
-void				ft_deletefilelist(t_files *files);
+void				ft_deletefilelist(t_files **files);
 
 #endif
